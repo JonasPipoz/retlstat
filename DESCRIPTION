@@ -1,0 +1,17 @@
+Package: retlstat
+Type: Package
+Title: Update, Create, create MS SQL tables
+Version: 0.2.0
+Author: Jonas Pipoz
+Maintainer: The package maintainer Jonas Pipoz <jonas.pipoz@gmail.com>
+Description: This package offer tool to insert into, update, create table in sql server.
+License: Free
+Encoding: UTF-8
+LazyData: true
+Imports:
+    odbc,
+    DBI,
+    dplyr,
+    daff,
+    stringr
+RoxygenNote: 7.1.0
