@@ -15,6 +15,7 @@
 
 
 update_or_insert2 <- function(df,conn, BDD, Schema, table_name, id) {
+  .Deprecated("upsert")
   df <- rep_guillemets(df)
   df <- num_to_int(df)
   rowlist<-c()
