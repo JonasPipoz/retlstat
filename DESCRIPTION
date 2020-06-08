@@ -13,5 +13,6 @@ Imports:
     DBI,
     dplyr,
     daff,
-    stringr
+    stringr,
+    random
 RoxygenNote: 7.1.0
