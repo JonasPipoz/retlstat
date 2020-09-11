@@ -13,7 +13,7 @@
 #'
 
 col_store <- function(conn, bdd, schema, table_name, drop = FALSE ){
-  nom.indexe <- paste0("I_",table)
+  nom.indexe <- paste0("I_",table_name)
   if(drop == FALSE){
     dr <- 'OFF'
   }else{
