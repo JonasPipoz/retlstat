@@ -19,7 +19,7 @@ col_store <- function(conn, bdd, schema, table_name, drop = FALSE ){
   }else{
     dr <- 'ON'
   }
-  query <- paste0("CREATE CLUSTERED COLUMNSTORE INDEX [",nom.indexe ,"] ON [",schema,"].[",table,"] WITH  (DROP_EXISTING = ",dr,") ;")
+  query <- paste0("CREATE CLUSTERED COLUMNSTORE INDEX [",nom.indexe ,"] ON [",schema,"].[",table_name,"] WITH  (DROP_EXISTING = ",dr,") ;")
   #--default is OFF, Si il existe d?j? un index sur la table, il est possible de le remplacer par celui-ci ( DROP_EXISTING = ON)
 
   odbc::dbSendQuery(conn,query)

@@ -2,6 +2,7 @@
 
 export(change)
 export(col_store)
+export(drop_table)
 export(num_to_int)
 export(stat_add)
 export(stat_update)
