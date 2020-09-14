@@ -8,7 +8,6 @@
 #' @param Schema The sql schema
 #' @param table_name The sql Table
 #' @param id a unique identifier per row.
-#' @export
 #' @examples update_or_insert(df = mtcars, conn = conn, BDD = 'STATPRODTEMP',Schema = 'GEN',table_name = 'MTCARS',id = rownames(mtcars))
 #' update_or_insert()
 
