@@ -1,7 +1,7 @@
 #
 #' drop_table
 #'
-#' Cette fonction supprime une table spécifié.
+#' Cette fonction supprime une table spécifiée.
 #' @param conn A DBI connection
 #' @param bdd The sql database name
 #' @param schema The sql schema name
@@ -21,6 +21,7 @@ drop_table <- function(conn, bdd, schema, table_name){
 
     print(query)
     cat(paste0("Table: [",bdd,"].[",schema,"].[",table_name,"] supprimée.") )
+    odbc::dbSendQuery(conn,query)
 
   }
   else{

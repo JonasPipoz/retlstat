@@ -16,7 +16,7 @@ drop_table(conn, bdd, schema, table_name)
 \item{table}{The sql Table name}
 }
 \description{
-Cette fonction supprime une table spécifié.
+Cette fonction supprime une table spécifiée.
 }
 \examples{
 drop_table(conn = conn, BDD = 'STATPRODTEMP',Schema = 'GEN',table_name = 'MTCARS')
