@@ -2,9 +2,9 @@
 
 export(change)
 export(col_store)
+export(drop_replace)
 export(drop_table)
 export(num_to_int)
 export(stat_add)
-export(stat_update)
 export(table_create)
 export(upsert)
