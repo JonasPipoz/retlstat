@@ -1,12 +1,12 @@
 #
 #' drop_replace
 #'
-#' This function crée une table a partir d'un dataframe
-#' @param df A dataframe containing the data. Default is null
-#' @param conn A DBI connection
-#' @param BDD The sql database name
-#' @param Schema The sql schema
-#' @param table_name The sql Table
+#' cette fonction remplace les données d'une table existante
+#' @param df Un data frame contenant les nouvelles données
+#' @param conn Une connection DBI
+#' @param BDD Le nom de la base de donnée
+#' @param Schema Le schéma SQL server dans lequel la table se trouve
+#' @param table_name Le nom de la table sql
 
 #' @export
 #' @examples drop_replace(df = mtcars, conn = conn, BDD = 'STATPRODTEMP',Schema = 'GEN',table_name = 'MTCARS')

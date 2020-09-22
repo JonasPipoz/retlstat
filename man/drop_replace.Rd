@@ -13,18 +13,18 @@ drop_replace(
 )
 }
 \arguments{
-\item{df}{A dataframe containing the data. Default is null}
+\item{df}{Un data frame contenant les nouvelles données}
 
-\item{conn}{A DBI connection}
+\item{conn}{Une connection DBI}
 
-\item{BDD}{The sql database name}
+\item{BDD}{Le nom de la base de donnée}
 
-\item{Schema}{The sql schema}
+\item{Schema}{Le schéma SQL server dans lequel la table se trouve}
 
-\item{table_name}{The sql Table}
+\item{table_name}{Le nom de la table sql}
 }
 \description{
-This function crée une table a partir d'un dataframe
+cette fonction remplace les données d'une table existante
 }
 \examples{
 drop_replace(df = mtcars, conn = conn, BDD = 'STATPRODTEMP',Schema = 'GEN',table_name = 'MTCARS')
