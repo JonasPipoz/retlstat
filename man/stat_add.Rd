@@ -2,20 +2,20 @@
 % Please edit documentation in R/add_to_table.R
 \name{stat_add}
 \alias{stat_add}
-\title{add_to_table}
+\title{stat_add}
 \usage{
-stat_add(dataframe = NULL, conn, BDD, Schema, Table)
+stat_add(df = NULL, conn = NULL, BDD = NULL, Schema = NULL, table_name = NULL)
 }
 \arguments{
-\item{dataframe}{A dataframe containing the data. Default is null}
+\item{df}{un dataframe contenant les données}
 
-\item{conn}{A DBI connection}
+\item{conn}{une connexion DBI}
 
-\item{BDD}{The sql database name}
+\item{BDD}{Le nom de la base de données sql}
 
-\item{Schema}{The sql schema}
+\item{Schema}{Le schema sql}
 
-\item{Table}{The sql Table}
+\item{table_name}{Le nom de la table sql}
 }
 \description{
 This function add a dataframe to an existing sql table.

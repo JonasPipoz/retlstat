@@ -1,41 +1,40 @@
 # ADD to table!
 #
-# This function add a dataframe to a table sql
+# Cette fonction ajoute des données à partir dans dataframe dans une table SQL existante
 #
-#
-# You can learn more about package authoring with RStudio at:
-#
-#   http://r-pkgs.had.co.nz/
-#
-# Some useful keyboard shortcuts for package authoring:
-#
-#   Build and Reload Package:  'Ctrl + Shift + B'
-#   Check Package:             'Ctrl + Shift + E'
-#   Test Package:              'Ctrl + Shift + T'
-# Pour installer le package
-#path <- "P:/INSTALL/Outils/R/Packages_fait_maison/retlstat_0.1.0.tar.gz"
-#install.packages(path, repos = NULL, type = "source")
-
-#' add_to_table
+#' stat_add
 #'
 #' This function add a dataframe to an existing sql table.
-#' @param dataframe A dataframe containing the data. Default is null
-#' @param conn A DBI connection
-#' @param BDD The sql database name
-#' @param Schema The sql schema
-#' @param Table The sql Table
+#' @param df un dataframe contenant les données
+#' @param conn une connexion DBI
+#' @param BDD Le nom de la base de données sql
+#' @param Schema Le schema sql
+#' @param table_name Le nom de la table sql
 #' @export
 #' @examples stat_add(mtcars, conn, 'STATPRODTEMP','GEN','MTCARS')
 #' stat_add()
 
-stat_add <- function(dataframe = NULL,conn,BDD,Schema,Table){
-  col_data <- names(dataframe)
-  apply(dataframe, 1, sendrow,
-        conn = conn,
-        BDD = BDD,
-        Schema = Schema,
-        table_name = Table,
-        col_data = col_data)
+stat_add <- function(df = NULL, conn = NULL, BDD = NULL, Schema = NULL, table_name = NULL){
+  areyousure <- readline(prompt= paste0("Etes-vous sûre de vouloir ajouter ",nrow(df),"lignes dans la table [",bdd,"].[",schema,"].[",table_name,"]? o/n : "))
 
+  if (areyousure == 'o'){
+    df <- num_to_int(df)
+    print('Formats de nombre modifiés.')
+    table_id <- DBI::Id(schema = Schema,
+                        table = table_name)
+    DBI::dbWriteTable(conn = conn,
+                      name = table_id,
+                      value = df,
+                      append = T,
+                      overwrite = F)
+
+    cat(paste('Table', table_name, 'mise-à-jour par écrasement.', as.character(dim(df)[1]),'observations de ',as.character(dim(df)[2]),'variables ont été ajoutées à la table.\n'))
+  }
+  else{
+    cat('Oppération annulé')
+  }
+
+  return(NULL)
 }
+
 
