@@ -15,7 +15,9 @@
 #' stat_add()
 
 stat_add <- function(df = NULL, conn = NULL, BDD = NULL, Schema = NULL, table_name = NULL){
-  areyousure <- readline(prompt= paste0("Etes-vous sûre de vouloir ajouter ",nrow(df),"lignes dans la table [",bdd,"].[",schema,"].[",table_name,"]? o/n : "))
+  areyousure <- readline(prompt= paste0("Etes-vous sûre de vouloir ajouter ",
+                                        nrow(df),"lignes dans la table [",BDD,"].[",Schema,"].[",
+                                        table_name,"]? o/n : "))
 
   if (areyousure == 'o'){
     df <- num_to_int(df)
@@ -28,10 +30,15 @@ stat_add <- function(df = NULL, conn = NULL, BDD = NULL, Schema = NULL, table_na
                       append = T,
                       overwrite = F)
 
-    cat(paste('Table', table_name, 'mise-à-jour par écrasement.', as.character(dim(df)[1]),'observations de ',as.character(dim(df)[2]),'variables ont été ajoutées à la table.\n'))
+    cat(paste('Table', table_name,
+              'mise-à-jour par ajout.',
+              as.character(dim(df)[1]),
+              'observations de '
+              ,as.character(dim(df)[2]),
+              'variables ont été ajoutées à la table.\n'))
   }
   else{
-    cat('Oppération annulé')
+    cat('Oppération annulée')
   }
 
   return(NULL)

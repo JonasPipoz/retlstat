@@ -12,7 +12,9 @@
 #' @examples drop_replace(df = mtcars, conn = conn, BDD = 'STATPRODTEMP',Schema = 'GEN',table_name = 'MTCARS')
 #' drop_replace()
 drop_replace <- function(df = NULL, conn = NULL, BDD = NULL, Schema = NULL, table_name = NULL){
-  areyousure <- readline(prompt= paste0("Etes-vous sûre de vouloir supprimer les données contenues dans la table [",bdd,"].[",schema,"].[",table_name,"]? o/n : "))
+  areyousure <- readline(prompt= paste0("Etes-vous sûre de vouloir supprimer les données contenues dans la table [",
+                                        BDD,"].[",
+                                        Schema,"].[",table_name,"]? o/n : "))
 
   if (areyousure == 'o'){
     df <- num_to_int(df)
@@ -25,10 +27,12 @@ drop_replace <- function(df = NULL, conn = NULL, BDD = NULL, Schema = NULL, tabl
                       append = F,
                       overwrite = T)
 
-  cat(paste('Table', table_name, 'mise-à-jour par écrasement.', as.character(dim(df)[1]),'observations de ',as.character(dim(df)[2]),'variables ont été ajoutées à la table.\n'))
+  cat(paste('Table', table_name, 'mise-à-jour par écrasement.',
+            as.character(dim(df)[1]),'observations de ',
+            as.character(dim(df)[2]),'variables ont été ajoutées à la table.\n'))
   }
   else{
-    cat('Oppération annulé')
+    cat('Oppération annulée')
   }
 
   return(NULL)
