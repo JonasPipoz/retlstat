@@ -25,35 +25,43 @@ change <- function(df_original, df_nouveau, id){
 
   dif <- daff::diff_data(df_original, df_nouveau, ids = 'id')
   chf <- dif$get_data()
-  names(chf)<- chf[1,]
-  chf<-chf[-1,]
-  names(chf) <- stringr::str_replace(names(chf),"@@", 'ch')
-  print(head(chf))
+  if (length(chf)==0){
+    cat('Les deux datasets sont identiques.')
+    return(NULL)
+  }else{
+    cat('Il existe des différences.\n\n')
+    names(chf) <- stringr::str_replace(names(chf),"@@", 'ch')
+    print(head(chf))
 
-  chf <- dplyr::select(chf,ch,id)
+    chf <- dplyr::select(chf,ch,id)
 
-  ad <-  dplyr::filter(chf,ch == '+++')
+    ad <-  dplyr::filter(chf,ch == '+++')
 
-  del <- dplyr::filter(chf,ch == '---')
+    del <- dplyr::filter(chf,ch == '---')
 
-  up <- dplyr::filter(chf,ch == '->')
+    up <- dplyr::filter(chf,ch == '->')
 
-  update_new <- dplyr::filter(df_nouveau, id %in% up$id)
-  update_old <- dplyr::filter(df_nouveau, id %in% up$id)
-  add <- dplyr::filter(df_nouveau, id %in% ad$id)
-  delete <- dplyr::filter(df_original, id %in% del$id)
+    update_new <- dplyr::filter(df_nouveau, id %in% up$id)
+    update_old <- dplyr::filter(df_nouveau, id %in% up$id)
+    add <- dplyr::filter(df_nouveau, id %in% ad$id)
+    delete <- dplyr::filter(df_original, id %in% del$id)
 
 
-  summary <- data.frame(added = nrow(add),
-                        updated = nrow(update_new),
-                        deleted = nrow(delete))
-  names(update_new) <-  stringr::str_replace(names(update_new),'id',id)
-  names(update_old) <-  stringr::str_replace(names(update_old),'id',id)
-  names(add) <-  stringr::str_replace(names(add) ,'id',id)
-  names(delete) <- stringr::str_replace(names(delete),'id',id)
+    summary <- data.frame(added = nrow(add),
+                          updated = nrow(update_new),
+                          deleted = nrow(delete))
+    names(update_new) <-  stringr::str_replace(names(update_new),'id',id)
+    names(update_old) <-  stringr::str_replace(names(update_old),'id',id)
+    names(add) <-  stringr::str_replace(names(add) ,'id',id)
+    names(delete) <- stringr::str_replace(names(delete),'id',id)
 
-  changes <- list("added" = add, "deleted"= delete, "updated_new" = update_new,"updated_old" = update_old, "summary"=summary)
+    changes <- list("added" = add, "deleted"= delete, "updated_new" = update_new,"updated_old" = update_old, "summary"=summary)
+
+    cat('résumé des différences entre les deux datasets:\n\n' )
+    print(summary)
+
   return(changes)
+  }
 
 
 }
