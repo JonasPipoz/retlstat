@@ -41,7 +41,7 @@ change <- function(df_original, df_nouveau, id){
     up <- dplyr::filter(chf,ch == '->')
 
     update_new <- dplyr::filter(df_nouveau, id %in% up$id)
-    update_old <- dplyr::filter(df_nouveau, id %in% up$id)
+    update_old <- dplyr::filter(df_original, id %in% up$id)
     add <- dplyr::filter(df_nouveau, id %in% ad$id)
     delete <- dplyr::filter(df_original, id %in% del$id)
 

@@ -14,8 +14,8 @@
 num_to_int <- function(df = NULL){
   # Mutate des variables numériques en entier si nécessaire.
   # Si la somme de la retenu de la division par 1 == 0 --> Transforme la variable en entier.
-  df <- df %>%dplyr::mutate_if(~ (is.numeric(.) & (sum(as.numeric(.) %% 1, na.rm = T) == 0)),
-                            funs(as.integer(.)))
+  suppressWarnings(df <- df %>%dplyr::mutate_if(~ (is.numeric(.) & (sum(as.numeric(.) %% 1, na.rm = T) == 0)),
+                            funs(as.integer(.))))
   return(df)
 
 }
