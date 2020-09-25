@@ -31,7 +31,6 @@ change <- function(df_original, df_nouveau, id){
   }else{
     cat('Il existe des différences.\n\n')
     names(chf) <- stringr::str_replace(names(chf),"@@", 'ch')
-    print(head(chf))
 
     chf <- dplyr::select(chf,ch,id)
 
