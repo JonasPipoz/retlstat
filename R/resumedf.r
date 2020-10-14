@@ -15,15 +15,14 @@ resumedf <- function(df) {
 
   vided <-  data.frame(vide = t(t(sapply(df, function(x) sum(as.character(x) == '')) ) ) )
 
-  suppressWarnings(meand <-  data.frame(moyenne = t(t(sapply(df, function(x) round(mean(as.numeric(x)),2)) ) ) ))
-  suppressWarnings(mind <-  data.frame(min = t(t(sapply(df, function(x) round(min(as.numeric(x)),2)) ) ) ))
-  suppressWarnings(maxd <-  data.frame(max = t(t(sapply(df, function(x) round(max(as.numeric(x)),2)) ) ) ))
+  suppressWarnings(meand <-  data.frame(moyenne = t(t(sapply(df, function(x) round(mean(as.numeric(x), na.rm = T),2)) ) ) ))
+  suppressWarnings(mind <-  data.frame(min = t(t(sapply(df, function(x) round(min(as.numeric(x), na.rm = T),2)) ) ) ))
+  suppressWarnings(maxd <-  data.frame(max = t(t(sapply(df, function(x) round(max(as.numeric(x), na.rm = T),2)) ) ) ))
 
   typed <- data.frame(type = t(t(sapply(df, function(x) typeof(x)) ) ) )
 
 
   ret <- cbind(typed, nad, zerod, vided, meand, mind, maxd)
-  #ret <- sapply(ret, function(x) replace_na(x, 0))
   ret
 }
 
