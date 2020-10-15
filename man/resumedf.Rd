@@ -9,10 +9,13 @@ resumedf(df)
 \arguments{
 \item{df}{un dataframe pour lequel un résumé est désiré}
 }
+\value{
+Retourne un dataframe contenant le nombre de valeurs manquantes (NA, Zero, Vide), la part qu'elles représentent sur l'ensemble du dataframe.
+}
 \description{
 This function mets a jour les données dans une table si l'id existe dans la table sql server ou alors ajoute les données a partir d'un dataframe
 }
 \examples{
-resumedf(df = mtcars)
+resumedf(df = iris)
 resumedf()
 }
