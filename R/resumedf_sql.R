@@ -13,7 +13,7 @@
 
 resumedf_sql <- function(conn, Schema, nom.table) {
   q1 <- dplyr::tbl(conn, dbplyr::in_schema(Schema, nom.table) )
-  q2 <- dbplyr::collect(q1) # lancer la requête SQL et charger dans R
+  q2 <- dplyr::collect(q1) # lancer la requête SQL et charger dans R
   #nom <- paste0(nom.table,"_", "Sql") # constuire le nom de l'objet à partir du nom de la table et de la date
   #assign(nom ,q2, envir = .GlobalEnv) # assigner le fruit de la requête (q2) au nom = création de l'objet nommé
   return(resumedf(q2))
