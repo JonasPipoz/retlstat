@@ -9,7 +9,7 @@
 #' plotdf()
 
 plotdf <- function(df){
-  types <- c("colonnes" = 1, 'points'=2, "lignes" = 3, 'pie' = 4, 'histogramme' = 5, "boxplot" = 6 )
+  types <- c("colonnes" = 1, 'points'=2, "lignes" = 3, 'histogramme' = 5, "boxplot" = 6, 'violons' = 7 )
 
   print(types)
   types_selected <- readline(paste0("Quel type de graphique voulez-vous? (ex: pour des bars tappez 1) :"))
@@ -63,7 +63,25 @@ plotdf <- function(df){
         ggplot2::geom_boxplot()+
         ggplot2::guides(fill=ggplot2::guide_legend(v.cat))
     }else{
-      g <- ggplot2::ggplot(df, ggplot2::aes(df[[x]])) + ggplot2::geom_histogram()
+      g <- ggplot2::ggplot(df, ggplot2::aes(df[[x]])) + ggplot2::geom_boxplot()
+    }
+    g <- g + ggplot2::xlab(v.cat) + ggplot2::ylab(x) + ggplot2::theme_light()
+  }
+
+  # violon
+  if (types_selected == '7') {
+    x <- readline("Quelle variable en x ? (Variable continue) :")
+    cate <- readline("Souhaitez-vous ajouter une variable catégorielle? (o/n) :")
+    if (cate == 'o') {
+      v.cat <- readline("Quelle est la variable catégorielle? :")
+
+    }
+    if (cate == 'o') {
+      g <- ggplot2::ggplot(df, ggplot2::aes(df[[v.cat]],df[[x]], fill = df[[v.cat]],group = df[[v.cat]])) +
+        ggplot2::geom_violin()+
+        ggplot2::guides(fill=ggplot2::guide_legend(v.cat))
+    }else{
+      g <- ggplot2::ggplot(df, ggplot2::aes(df[[x]])) + ggplot2::geom_violin()
     }
     g <- g + ggplot2::xlab(v.cat) + ggplot2::ylab(x) + ggplot2::theme_light()
   }
