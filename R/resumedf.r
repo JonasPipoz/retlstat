@@ -24,8 +24,9 @@ resumedf <- function(df) {
   i <- 1
   for (var in formatdf) {
     if (var == T) {
-      cat(paste0("La valeur maximum de la variable : '",names(formatdf)[i],"' est :\n"))
-      cat(paste0(max(as.Date(as.character(df[[i]]),format="%Y-%m-%d")), na.rm= T), "\n")
+      cat(paste0("Les valeurs min et max de la variable : '",names(formatdf)[i],"' est :\n"))
+      cat(paste0(min(as.Date(as.character(df[[i]]),format="%Y-%m-%d"), na.rm= T), "\n",
+                 max(as.Date(as.character(df[[i]]),format="%Y-%m-%d"), na.rm= T), "\n"))
       df[[i]] <- as.Date(df[[i]])
       }
     i = i + 1
