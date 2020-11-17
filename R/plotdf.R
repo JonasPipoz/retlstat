@@ -39,7 +39,7 @@ plotdf <- function(df){
   }
 
   # histogramme
-  if (types_selected == '5') {
+  if (types_selected == '4') {
     x <- readline("Quelle variable en x ? (Variable continue) :")
     bin <- readline("Quelle est la taille des classes ? :")
 
@@ -51,7 +51,7 @@ plotdf <- function(df){
   }
 
   # boxplot
-  if (types_selected == '6') {
+  if (types_selected == '5') {
     x <- readline("Quelle variable en x ? (Variable continue) :")
     cate <- readline("Souhaitez-vous ajouter une variable catégorielle? (o/n) :")
     if (cate == 'o') {
@@ -69,7 +69,7 @@ plotdf <- function(df){
   }
 
   # violon
-  if (types_selected == '7') {
+  if (types_selected == '6') {
     x <- readline("Quelle variable en x ? (Variable continue) :")
     cate <- readline("Souhaitez-vous ajouter une variable catégorielle? (o/n) :")
     if (cate == 'o') {
