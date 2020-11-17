@@ -17,9 +17,9 @@ shinee <- function(df) {
                 radioButtons('type', 'Type de graphique', c("colonnes", 'points', "lignes", 'histogramme' , "boxplot" , 'violons' )),
                 selectInput('x', "Variables en ordonnée", var ),
                 selectInput('x','Variable en absysse', var),
-                selectInput('g','Variable catégorielle', c("null",var)),
+                selectInput('g','Variable catégorielle', c("null",var))),
                 mainPanel(plotOutput("plot"))
-            )
+
         ),
         server = function(input, output) {
             output$plot <- renderPlot(
