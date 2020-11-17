@@ -15,5 +15,6 @@ Imports:
     daff,
     stringr,
     random,
-    dbplyr
+    dbplyr,
+    shiny
 RoxygenNote: 7.1.1
