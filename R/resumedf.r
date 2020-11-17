@@ -15,8 +15,22 @@ resumedf <- function(df) {
   cat(paste0("##    n. colonnes       :       ",ncol(df),"\n"))
   cat(paste0("##########################################\n"))
   cat(paste0("##########################################\n"))
-  cat(paste0("##########################################\n\n\n"))
+  cat(paste0("##########################################\n\n"))
 
+  formatdf <- sapply(df, function(x) !all(is.na(as.Date(as.character(x),format="%Y-%m-%d"))))
+  if (T %in% formatdf) {
+
+  cat(paste0(" ---- Valeurs maximums des dates: ----- \n"))
+  i <- 1
+  for (var in formatdf) {
+    if (var == T) {
+      cat(paste0("La valeur maximum de la variable : '",names(formatdf)[i],"' est :\n"))
+      cat(paste0(max(as.Date(as.character(df[[i]]),format="%Y-%m-%d")), na.rm= T), "\n")
+      df[[i]] <- as.Date(df[[i]])
+      }
+    i = i + 1
+    }
+  }
   nad <- data.frame(na = t(t(sapply(df, function(x) sum(is.na(x))))))
   unicited <- data.frame(unicite = t(t(sapply(df, function(x) ifelse(sum(duplicated(x))==0,TRUE,FALSE)))))
 
