@@ -8,7 +8,7 @@
 #' @param nom.table The sql Table
 #' @return Retourne un dataframe contenant le nombre de valeurs manquantes (NA, Zero, Vide), la part qu'elles représentent sur l'ensemble du dataframe.
 #' @export
-#' @examples resumedf_sql(conn = conn, Schema = 'dbo' , nom.table = 'mtcars')
+#' @examples resumedf_sql(conn = conn, Schema = 'dbo' , nom.table = "[mtcars]")
 #' resumedf_sql()
 
 resumedf_sql <- function(conn, Schema, nom.table) {

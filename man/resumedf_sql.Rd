@@ -22,6 +22,6 @@ Retourne un dataframe contenant le nombre de valeurs manquantes (NA, Zero, Vide)
 This function mets a jour les données dans une table si l'id existe dans la table sql server ou alors ajoute les données a partir d'un dataframe
 }
 \examples{
-resumedf_sql(conn = conn, Schema = 'dbo' , nom.table = 'mtcars')
+resumedf_sql(conn = conn, Schema = 'dbo' , nom.table = "[mtcars]")
 resumedf_sql()
 }
