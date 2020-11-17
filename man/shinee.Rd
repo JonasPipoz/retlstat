@@ -4,7 +4,7 @@
 \alias{shinee}
 \title{plotdf}
 \usage{
-shinee(var)
+shinee(df)
 }
 \arguments{
 \item{var}{une variable contine}
