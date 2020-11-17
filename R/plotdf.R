@@ -9,7 +9,7 @@
 #' plotdf()
 
 plotdf <- function(df){
-  types <- c("colonnes" = 1, 'points'=2, "lignes" = 3, 'histogramme' = 5, "boxplot" = 6, 'violons' = 7 )
+  types <- c("colonnes" = 1, 'points'=2, "lignes" = 3, 'histogramme' = 4, "boxplot" = 5, 'violons' = 6 )
 
   print(types)
   types_selected <- readline(paste0("Quel type de graphique voulez-vous? (ex: pour des bars tappez 1) :"))
