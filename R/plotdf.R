@@ -44,7 +44,7 @@ plotdf <- function(df){
     bin <- readline("Quelle est la taille des classes ? :")
 
 
-    g <- ggplot2::ggplot(df, ggplot2::aes(df[[x]])) + ggplot2::geom_histogram(binwidth = as.numeric(bin))+  ggplot2::guides(fill=ggplot2::guide_legend(v.cat))
+    g <- ggplot2::ggplot(df, ggplot2::aes(df[[x]])) + ggplot2::geom_histogram(binwidth = as.numeric(bin))
 
 
     g <- g + ggplot2::xlab(x) + ggplot2::theme_light()
