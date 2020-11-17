@@ -10,21 +10,20 @@
 
 resumedf <- function(df) {
   options(scipen = 999)
-  cat(paste0("\n\n##########################################\n"))
+  cat(paste0("\n\n--------------------------------------\n"))
   cat(paste0("##    n. lignes         :       ",nrow(df),"\n"))
   cat(paste0("##    n. colonnes       :       ",ncol(df),"\n"))
-  cat(paste0("##########################################\n"))
-  cat(paste0("##########################################\n"))
-  cat(paste0("##########################################\n\n"))
+  cat(paste0("----------------------------------------\n"))
+  cat(paste0("----------------------------------------\n\n"))
 
   formatdf <- sapply(df, function(x) !all(is.na(as.Date(as.character(x),format="%Y-%m-%d"))))
   if (T %in% formatdf) {
 
-  cat(paste0(" ---- Valeurs maximums des dates: ----- \n"))
+  cat(paste0(" ---- Valeurs minimales et maximales des dates: ----- \n"))
   i <- 1
   for (var in formatdf) {
     if (var == T) {
-      cat(paste0("Les valeurs min et max de la variable : '",names(formatdf)[i],"' est :\n"))
+      cat(paste0("Les valeurs min et max de la variable : '",names(formatdf)[i],"' sont :\n"))
       cat(paste0(min(as.Date(as.character(df[[i]]),format="%Y-%m-%d"), na.rm= T), "\n",
                  max(as.Date(as.character(df[[i]]),format="%Y-%m-%d"), na.rm= T), "\n"))
       df[[i]] <- as.Date(df[[i]])
