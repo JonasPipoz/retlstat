@@ -19,8 +19,8 @@ plotdf_shine <- function(df) {
             sidebarLayout(
                 sidebarPanel(
                     radioButtons('type', 'Type de graphique', c("colonnes", 'points', "lignes", 'histogramme' , "boxplot" , 'violons' )),
-                    selectInput('x', "Variables en ordonnée", var ),
-                    selectInput('y','Variable en absysse', var),
+                    selectInput('x', "Variables en abscisse (x)", c("null",var) ),
+                    selectInput('y','Variable en ordonnée (y)', c("null",var)),
                     selectInput('g','Variable catégorielle', c("null",var))
                     ),
                 mainPanel(plotOutput("hist"))
