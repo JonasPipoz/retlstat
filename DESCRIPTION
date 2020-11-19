@@ -17,5 +17,6 @@ Imports:
     random,
     dbplyr,
     ggplot2,
+    DT,
     shiny
 RoxygenNote: 7.1.1

@@ -8,7 +8,7 @@
 #' @examples plotdf_shinesql(conn)
 #' plotdf_shinesql()
 
-plotdf_shinesql <- function(conn) {
+plotsql <- function(conn) {
   require(shiny)
 
   shinyApp(
@@ -24,7 +24,7 @@ plotdf_shinesql <- function(conn) {
           textInput('filtre', 'Filtrer les données (dplyr), ex: ANNEE == 2020')
         ),
         mainPanel(plotOutput("hist"),
-                  dataTableOutput('tableau'))
+                  DT::dataTableOutput('tableau'))
       )
     ),
     server = function(input, output,session) {
@@ -74,7 +74,7 @@ plotdf_shinesql <- function(conn) {
         updateSelectInput(session, "table",
                           choices = tables()$Tab)
       })
-      output$tableau <- renderDataTable({
+      output$tableau <- DT::renderDataTable({
         if (input$aff.table == T) {
           NewDonnee()
         }
@@ -185,4 +185,4 @@ plotdf_shinesql <- function(conn) {
       }
       )
     }
-
+#plotdf_shinesql(conn)
