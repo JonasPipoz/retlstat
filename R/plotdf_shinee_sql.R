@@ -16,15 +16,19 @@ plotdf_shinesql <- function(conn) {
       sidebarLayout(
         sidebarPanel(
           selectInput('table','Tables SQL', c("11001033_PAYS")),
-          radioButtons('type', 'Type de graphique', c('null',"colonnes", 'points', "lignes", 'histogramme' , "boxplot" , 'violons' )),
+          checkboxInput('aff.table','Afficher les données', F),
+          radioButtons('type', 'Type de graphique', c('null',"colonnes", 'points', "lignes", 'histogramme' , "boxplot" , 'violons', 'table' )),
           selectInput('x', "Variables en abscisse (x)", c("null")),
           selectInput('y','Variable en ordonnée (y)', c("null")),
-          selectInput('g','Variable catégorielle', c("null"))
+          selectInput('g','Variable catégorielle', c("null")),
+          textInput('filtre', 'Filtrer les données (dplyr), ex: ANNEE == 2020')
         ),
-        mainPanel(plotOutput("hist"))
+        mainPanel(plotOutput("hist"),
+                  dataTableOutput('tableau'))
       )
     ),
     server = function(input, output,session) {
+      #cat(input$aff.table)
       tables <- reactive({
         query <- "SELECT [Table Name] as Tab
         ,[Schéma] as Sch
@@ -49,7 +53,13 @@ plotdf_shinesql <- function(conn) {
         })
       var <- reactive({names(donnee())})
       NewDonnee <- reactive({
-        return(donnee())
+        if (input$filtre != '') {
+          NewDonnee <- dplyr::filter(donnee(),!! rlang::parse_expr(input$filtre))
+          return(NewDonnee)
+        }else{
+          return(donnee())
+        }
+
         })
       observe({
         input$tables
@@ -64,7 +74,11 @@ plotdf_shinesql <- function(conn) {
         updateSelectInput(session, "table",
                           choices = tables()$Tab)
       })
-
+      output$tableau <- renderDataTable({
+        if (input$aff.table == T) {
+          NewDonnee()
+        }
+      })
       output$hist <- renderPlot({
         input$table
         if (input$type == 'points') {
