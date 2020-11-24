@@ -10,25 +10,78 @@
 
 plotsql <- function(conn) {
   require(shiny)
+  require(shinythemes)
+  require(shinyFiles)
 
   shinyApp(
-    ui = fluidPage(
+    ui = fluidPage(theme = shinytheme("superhero"),
       sidebarLayout(
-        sidebarPanel(
+        sidebarPanel('Plot',
           selectInput('table','Tables SQL', c("11001033_PAYS")),
-          checkboxInput('aff.table','Afficher les données', F),
-          radioButtons('type', 'Type de graphique', c('null',"colonnes", 'points', "lignes", 'histogramme' , "boxplot" , 'violons', 'table' )),
-          selectInput('x', "Variables en abscisse (x)", c("null")),
-          selectInput('y','Variable en ordonnée (y)', c("null")),
-          selectInput('g','Variable catégorielle', c("null")),
-          textInput('filtre', 'Filtrer les données (dplyr), ex: ANNEE == 2020')
+          radioButtons('type', 'Type de graphique', c('-',"colonnes", 'points', "lignes", 'histogramme' , "boxplot" , 'violons' )),
+          selectInput('x', "Variables en abscisse (x)", c("-")),
+          selectInput('y','Variable en ordonnée (y)', c("-")),
+          selectInput('g','Variable catégorielle', c("-"))
+
+
         ),
-        mainPanel(plotOutput("hist"),
-                  DT::dataTableOutput('tableau'))
+        mainPanel(plotOutput("hist"))
+      ),
+      sidebarLayout(
+        sidebarPanel('Filtrer les données:',
+                     textInput('filtre', 'Filtrer les données (dplyr), ex: ANNEE == 2020'),
+                     checkboxInput('aff.table','Afficher les données', F)
+
+        ),
+        mainPanel(
+
+          DT::dataTableOutput('tableau')
+        )
+      ),
+      sidebarLayout(
+        sidebarPanel('Exporter',
+                     textInput('nom.df','Nommer les données:',value = "df_sql"),
+                     actionButton('load.in.r',"Charger dans R"),
+                     verbatimTextOutput("dir", placeholder = TRUE),
+                     shinyDirButton("dir", "Changer le dossier d'export", "Exporter donnée en CSV - Choix du dossier"),
+                     actionButton('export.csv',"Exporter en csv")
+      ),
+      mainPanel(
+        tableOutput('toto')
+                )
       )
     ),
+    ###############################################################
+    ############ SERVER   #########################################
+    ###############################################################
+
     server = function(input, output,session) {
-      #cat(input$aff.table)
+      shinyDirChoose(
+        input,
+        'dir',
+        roots = c(home = substr(getwd(),1,3)),
+        filetypes = c('', 'txt', 'bigWig', "tsv", "csv", "bw")
+      )
+      global <- reactiveValues(datapath = getwd())
+
+      dir <- reactive(input$dir)
+
+      output$dir <- renderText({
+        global$datapath
+      })
+
+      observeEvent(ignoreNULL = TRUE,
+                   eventExpr = {
+                     input$dir
+                   },
+                   handlerExpr = {
+                     if (!"path" %in% names(dir())) return()
+                     home <- normalizePath("~")
+                     global$datapath <-
+                       file.path(substr(getwd(),1,3), paste(unlist(dir()$path[-1]), collapse = .Platform$file.sep))
+                   })
+
+
       tables <- reactive({
         query <- "SELECT [Table Name] as Tab
         ,[Schéma] as Sch
@@ -51,49 +104,79 @@ plotsql <- function(conn) {
 
 
         })
-      var <- reactive({names(donnee())})
+      var <- reactive({names(NewDonnee())})
+      # Selection des données filtrees
       NewDonnee <- reactive({
         if (input$filtre != '') {
-          NewDonnee <- dplyr::filter(donnee(),!! rlang::parse_expr(input$filtre))
-          return(NewDonnee)
+
+          tryCatch({
+            dplyr::filter(donnee(),!! rlang::parse_expr(input$filtre))
+
+          },
+           error = function(cond){
+
+             return(dplyr::mutate(donnee(), n = 1))
+           }
+          )
+
         }else{
-          return(donnee())
+          return(dplyr::mutate(donnee(), n = 1))
         }
 
         })
+      #Chargement dans R
+      observeEvent(input$load.in.r, assign(paste0(isolate(input$nom.df)) ,NewDonnee(), envir = .GlobalEnv))
+
+      #export CSV
+      observeEvent(input$export.csv, write.table(x = NewDonnee(), file = paste0(global$datapath,"/",isolate(input$nom.df),".csv"),sep= ';', row.names = F))
+      # Modification des variables pour les graphs selon la table sql choisie
       observe({
         input$tables
         updateSelectInput(session, "x",
-                          choices = var())
+                          choices =  c('-',var()))
         updateSelectInput(session, "y",
-                          choices = var())
+                          choices = c('-',var()))
         updateSelectInput(session, "g",
-                          choices = var())
+                          choices = c('-',var()))
         })
       observe({
         updateSelectInput(session, "table",
                           choices = tables()$Tab)
       })
+
+      ############
+      ############ RENDER
+      ############
+      ## table
       output$tableau <- DT::renderDataTable({
+
         if (input$aff.table == T) {
-          NewDonnee()
+          DT::datatable(data = NewDonnee(),
+                        options = list(
+                          initComplete = DT::JS(
+                            "function(settings, json) {",
+                            "$(this.api().table().header()).css({'color': '#eee'});",
+                            "}")))
+
+
         }
       })
+      ## Plot
       output$hist <- renderPlot({
         input$table
         if (input$type == 'points') {
           x <- input$x
           y <- input$y
 
-          if (input$g != "null") {
+          if (input$g != "-") {
             v.cat <- input$g
           }
-          if (input$g != "null") {
+          if (input$g != "-") {
             g <- ggplot2::ggplot(NewDonnee(), ggplot2::aes(NewDonnee()[[x]],NewDonnee()[[y]], color = NewDonnee()[[v.cat]])) + ggplot2::geom_point()+ ggplot2::scale_x_discrete()+  ggplot2::guides(col=ggplot2::guide_legend(v.cat))
-            g <- g + ggplot2::xlab(x) + ggplot2::ylab(y) + ggplot2::theme_light()
+            g <- g + ggplot2::xlab(x) + ggplot2::ylab(y) + ggplot2::theme_dark() + ggplot2::theme(plot.background = ggplot2::element_rect(fill = "darkgrey"))
           }else{
             g <- ggplot2::ggplot(NewDonnee(), ggplot2::aes(NewDonnee()[[x]],NewDonnee()[[y]])) + ggplot2::geom_point()
-            g <- g + ggplot2::xlab(x) + ggplot2::ylab(y) + ggplot2::theme_light()
+            g <- g + ggplot2::xlab(x) + ggplot2::ylab(y) + ggplot2::theme_dark() + ggplot2::theme(plot.background = ggplot2::element_rect(fill = "darkgrey"))
           }
           g
         }else if (input$type == 'histogramme') {
@@ -103,56 +186,56 @@ plotsql <- function(conn) {
           g <- ggplot2::ggplot(NewDonnee(), ggplot2::aes(NewDonnee()[[x]])) + ggplot2::geom_histogram()
 
 
-          g <- g + ggplot2::xlab(x) + ggplot2::theme_light()
+          g <- g + ggplot2::xlab(x) + ggplot2::theme_dark() + ggplot2::theme(plot.background = ggplot2::element_rect(fill = "darkgrey"))
           g
         }else if (input$type == 'boxplot') {
           x <- input$x
           cate <- input$g
-          if (input$g != "null") {
+          if (input$g != "-") {
             v.cat <- input$g
 
           }
-          if (input$g != "null") {
-            g <- ggplot2::ggplot(NewDonnee(), ggplot2::aes(NewDonnee()[[v.cat]],NewDonnee()[[x]], fill = NewDonnee()[[v.cat]],group = NewDonnee()[[v.cat]])) +
+          if (input$g != "-") {
+            g <- ggplot2::ggplot(NewDonnee(), ggplot2::aes(NewDonnee()[[v.cat]],NewDonnee()[[y]], fill = NewDonnee()[[v.cat]],group = NewDonnee()[[v.cat]])) +
               ggplot2::geom_boxplot()+
               ggplot2::guides(fill=ggplot2::guide_legend(v.cat))
-            g <- g + ggplot2::xlab(v.cat) + ggplot2::ylab(x) + ggplot2::theme_light()
+            g <- g + ggplot2::xlab(v.cat) + ggplot2::ylab(y) + ggplot2::theme_dark() + ggplot2::theme(plot.background = ggplot2::element_rect(fill = "darkgrey"))
           }else{
-            g <- ggplot2::ggplot(NewDonnee(), ggplot2::aes(NewDonnee()[[x]])) + ggplot2::geom_boxplot()
-            g <- g + ggplot2::xlab(v.cat) + ggplot2::ylab(x) + ggplot2::theme_light()
+            g <- ggplot2::ggplot(NewDonnee(), ggplot2::aes(NewDonnee()[[y]])) + ggplot2::geom_boxplot()
+            g <- g + ggplot2::xlab(v.cat) + ggplot2::ylab(y) + ggplot2::theme_dark() + ggplot2::theme(plot.background = ggplot2::element_rect(fill = "darkgrey"))
           }
           g
         }else if (input$type == 'violons') {
           x <- input$x
           cate <- input$g
-          if (input$g != "null") {
+          if (input$g != "-") {
             v.cat <- input$g
 
           }
-          if (input$g != "null") {
+          if (input$g != "-") {
 
-            g <- ggplot2::ggplot(NewDonnee(), ggplot2::aes(NewDonnee()[[v.cat]],NewDonnee()[[x]], fill = NewDonnee()[[v.cat]],group = NewDonnee()[[v.cat]])) +
+            g <- ggplot2::ggplot(NewDonnee(), ggplot2::aes(NewDonnee()[[v.cat]],NewDonnee()[[y]], fill = NewDonnee()[[v.cat]],group = NewDonnee()[[v.cat]])) +
               ggplot2::geom_violin()+
               ggplot2::guides(fill=ggplot2::guide_legend(v.cat))
-            g <- g + ggplot2::xlab(v.cat) + ggplot2::ylab(x) + ggplot2::theme_light()
+            g <- g + ggplot2::xlab(v.cat) + ggplot2::ylab(y) + ggplot2::theme_dark() + ggplot2::theme(plot.background = ggplot2::element_rect(fill = "darkgrey"))
           }else{
-            g <- ggplot2::ggplot(NewDonnee(), ggplot2::aes(NewDonnee()[[x]])) + ggplot2::geom_violin()
-            g <- g + ggplot2::xlab(v.cat) + ggplot2::ylab(x) + ggplot2::theme_light()
+            g <- ggplot2::ggplot(NewDonnee(), ggplot2::aes(NewDonnee()[[y]])) + ggplot2::geom_violin()
+            g <- g + ggplot2::xlab(v.cat) + ggplot2::ylab(y) + ggplot2::theme_dark() + ggplot2::theme(plot.background = ggplot2::element_rect(fill = "darkgrey"))
           }
           g
         }else if (input$type == 'lignes') {
           x <- input$x
           y <- input$y
           cate <- input$g
-          if (input$g != "null") {
+          if (input$g != "-") {
             v.cat <- input$g
           }
-          if (input$g != "null") {
-            g <- ggplot2::ggplot(NewDonnee(), ggplot2::aes(NewDonnee()[[x]],NewDonnee()[[y]], color = NewDonnee()[[v.cat]])) + ggplot2::geom_line()+  ggplot2::guides(col=ggplot2::guide_legend(v.cat))
-            g <- g + ggplot2::xlab(x) + ggplot2::ylab(y) + ggplot2::theme_light()
+          if (input$g != "-") {
+            g <- ggplot2::ggplot(NewDonnee(), ggplot2::aes(NewDonnee()[[x]],NewDonnee()[[y]], group = NewDonnee()[[v.cat]], color = NewDonnee()[[v.cat]])) + ggplot2::geom_line()+  ggplot2::guides(col=ggplot2::guide_legend(v.cat))
+            g <- g + ggplot2::xlab(x) + ggplot2::ylab(y) + ggplot2::theme_dark() + ggplot2::theme(plot.background = ggplot2::element_rect(fill = "darkgrey"))
           }else{
             g <- ggplot2::ggplot(NewDonnee(), ggplot2::aes(NewDonnee()[[x]],NewDonnee()[[y]])) + ggplot2::geom_line()
-            g <- g + ggplot2::xlab(x) + ggplot2::ylab(y) + ggplot2::theme_light()
+            g <- g + ggplot2::xlab(x) + ggplot2::ylab(y) + ggplot2::theme_dark() + ggplot2::theme(plot.background = ggplot2::element_rect(fill = "darkgrey"))
           }
           g
         }else if (input$type == 'colonnes') {
@@ -160,23 +243,25 @@ plotsql <- function(conn) {
           y <- input$y
           cate <- input$g
 
-          if (cate != 'null') {
+          if (cate != '-') {
 
             v.cat <- input$g
           }
-          if (cate != 'null') {
+          if (cate != '-') {
 
             g <- ggplot2::ggplot(NewDonnee(), ggplot2::aes(NewDonnee()[[x]],NewDonnee()[[y]],fill = NewDonnee()[[v.cat]])) + ggplot2::geom_col() + ggplot2::scale_x_discrete() + ggplot2::guides(fill=ggplot2::guide_legend(v.cat))
-            g <- g + ggplot2::xlab(x) + ggplot2::ylab(y) + ggplot2::theme_light()
+            g <- g + ggplot2::xlab(x) + ggplot2::ylab(y) + ggplot2::theme_dark() + ggplot2::theme(plot.background = ggplot2::element_rect(fill = "darkgrey"))
           }else{
 
             g <- ggplot2::ggplot(NewDonnee(), ggplot2::aes(NewDonnee()[[x]],NewDonnee()[[y]])) + ggplot2::geom_col()
-            g <- g + ggplot2::xlab(x) + ggplot2::ylab(y) + ggplot2::theme_light()
+            g <- g + ggplot2::xlab(x) + ggplot2::ylab(y) + ggplot2::theme_dark() + ggplot2::theme(plot.background = ggplot2::element_rect(fill = "darkgrey"))
           }
 
 
           g
 
+        }else if (input$type == 'null'){
+         return(ggplot2::ggplot() + ggplot2::geom_blank() + ggplot2::theme(panel.background = ggplot2::element_rect(fill = "#2c3f50"), plot.background = ggplot2::element_rect(fill = "#2c3f50", colour = 'darkgrey', size = 1)))
         }
 
           }
@@ -185,4 +270,4 @@ plotsql <- function(conn) {
       }
       )
     }
-#plotdf_shinesql(conn)
+plotsql(conn)
