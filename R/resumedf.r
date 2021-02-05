@@ -35,9 +35,9 @@ resumedf <- function(df) {
   unicited <- data.frame(unicite = t(t(sapply(df, function(x) ifelse(sum(duplicated(x))==0,TRUE,FALSE)))))
 
 
-  zerod <-  data.frame(zeros = t(t(sapply(df, function(x) sum(x == 0)) ) ) )
+  zerod <-  data.frame(zeros = t(t(sapply(df, function(x) sum(x == 0, na.rm = T)) ) ) )
 
-  vided <-  data.frame(vide = t(t(sapply(df, function(x) sum(as.character(x) == '')) ) ) )
+  vided <-  data.frame(vide = t(t(sapply(df, function(x) sum(as.character(x) == '', na.rm = T)) ) ) )
 
   suppressWarnings(meand <-  data.frame(moyenne = t(t(sapply(df, function(x) round(mean(as.numeric(x), na.rm = T),2)) ) ) ))
   suppressWarnings(mind <-  data.frame(min = t(t(sapply(df, function(x) round(min(as.numeric(x), na.rm = T),2)) ) ) ))
@@ -45,7 +45,7 @@ resumedf <- function(df) {
 
   vided <- transform(vided, pourcent.manquant = round((replace(nad$na, NA, 0) + replace(vided$vide, NA, 0))/nrow(df)*100,2))
 
-  typed <- data.frame(type = t(t(sapply(df, function(x) typeof(x)) ) ) )
+  typed <- data.frame(class = t(t(sapply(df, function(x) class(x)) ) ) )
 
   ret <- cbind(typed, nad, vided, zerod, meand, mind, maxd, unicited)
   ret
