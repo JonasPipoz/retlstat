@@ -2,8 +2,10 @@
 
 export(change)
 export(col_store)
+export(copie)
 export(drop_replace)
 export(drop_table)
+export(fact)
 export(import_sql)
 export(num_to_int)
 export(plotdf)
