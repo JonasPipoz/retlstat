@@ -12,44 +12,60 @@ plotsql <- function(conn) {
   require(shiny)
   require(shinythemes)
   require(shinyFiles)
+  require(dplyr)
 
   shinyApp(
     ui = fluidPage(theme = shinytheme("superhero"),
-      sidebarLayout(
-        sidebarPanel('Plot',
-          selectInput('table','Tables SQL', c("11001033_PAYS")),
-          radioButtons('type', 'Type de graphique', c('-',"colonnes", 'points', "lignes", 'histogramme' , "boxplot" , 'violons' )),
-          selectInput('x', "Variables en abscisse (x)", c("-")),
-          selectInput('y','Variable en ordonnée (y)', c("-")),
-          selectInput('g','Variable catégorielle', c("-"))
+                   sidebarLayout(
+                     sidebarPanel('Plot',
+                                  selectInput('table','Tables SQL', c("11001033_PAYS")),
+                                  radioButtons('type', 'Type de graphique', c('-',"colonnes", 'points', "lignes", 'histogramme' , "boxplot" , 'violons' )),
+                                  selectInput('x', "Variables en abscisse (x)", c("-")),
+                                  selectInput('y','Variable en ordonnée (y)', c("-")),
+                                  selectInput('g','Variable catégorielle', c("-"))
 
 
-        ),
-        mainPanel(plotOutput("hist"))
-      ),
-      sidebarLayout(
-        sidebarPanel('Filtrer les données:',
-                     textInput('filtre', 'Filtrer les données (dplyr), ex: ANNEE == 2020'),
-                     checkboxInput('aff.table','Afficher les données', F)
+                     ),
+                     mainPanel(plotOutput("hist"))
+                   ),
+                   sidebarLayout(
+                     sidebarPanel('Manipuler les données:',
+                                  checkboxInput('aff.table','Afficher les données', F),
+                                  textInput('filtre', 'Filtrer les données (dplyr), ex: ANNEE == 2020'),
+                                  selectInput('select',
+                                              'Selectionner les colonnes (dplyr), ex: CANTON, ANNEE',
+                                              c(""),
+                                              multiple = T),
+                                  selectInput('group_by',
+                                              'Aggrèger les données (dplyr::group_by), ex: CANTON, ANNEE',
+                                              c(""),
+                                              multiple = T),
+                                  selectInput('summerise',
+                                              "Fonction d'agrégat",
+                                              c("Somme",'Moyenne','Max','Min','Nombre de ligne')),
+                                  selectInput('varagg',
+                                              "Valeur d'aggrégat",
+                                              c(""),
+                                              multiple = F),
 
-        ),
-        mainPanel(
+                     ),
+                     mainPanel(
 
-          DT::dataTableOutput('tableau')
-        )
-      ),
-      sidebarLayout(
-        sidebarPanel('Exporter',
-                     textInput('nom.df','Nommer les données:',value = "df_sql"),
-                     actionButton('load.in.r',"Charger dans R"),
-                     verbatimTextOutput("dir", placeholder = TRUE),
-                     shinyDirButton("dir", "Changer le dossier d'export", "Exporter donnée en CSV - Choix du dossier"),
-                     actionButton('export.csv',"Exporter en csv")
-      ),
-      mainPanel(
-        tableOutput('toto')
-                )
-      )
+                       DT::dataTableOutput('tableau')
+                     )
+                   ),
+                   sidebarLayout(
+                     sidebarPanel('Exporter',
+                                  textInput('nom.df','Nommer les données:',value = "df_sql"),
+                                  actionButton('load.in.r',"Charger dans R"),
+                                  verbatimTextOutput("dir", placeholder = TRUE),
+                                  shinyDirButton("dir", "Changer le dossier d'export", "Exporter donnée en CSV - Choix du dossier"),
+                                  actionButton('export.csv',"Exporter en csv")
+                     ),
+                     mainPanel(
+                       tableOutput('toto')
+                     )
+                   )
     ),
     ###############################################################
     ############ SERVER   #########################################
@@ -103,45 +119,193 @@ plotsql <- function(conn) {
 
 
 
-        })
+      })
       var <- reactive({names(NewDonnee())})
-      # Selection des données filtrees
+      ## Selection des données filtrees####
       NewDonnee <- reactive({
-        if (input$filtre != '') {
 
+        df <- mutate(donnee(),n = 1)
+        if (input$filtre != '') {
           tryCatch({
-            dplyr::filter(donnee(),!! rlang::parse_expr(input$filtre))
+
+            df <- dplyr::filter(
+              df,!! rlang::parse_expr(input$filtre)
+            )
 
           },
-           error = function(cond){
-
-             return(dplyr::mutate(donnee(), n = 1))
-           }
+          error = function(cond){
+            df <- df
+          }
           )
-
-        }else{
-          return(dplyr::mutate(donnee(), n = 1))
         }
 
-        })
+
+        if (!is.null(input$select)) {
+          tryCatch({
+            df <- dplyr::select(df,input$select)
+
+          },
+          error = function(cond){
+            df <- df
+          }
+          )
+
+        }
+
+        if (!is.null(input$group_by) & input$varagg == '-') {
+          tryCatch({
+            if (input$summerise == 'Nombre de ligne') {
+              df <- dplyr::group_by_at(df,dplyr::vars(input$group_by)) %>%
+                dplyr::summarise(N = n())
+            }
+            },
+            error = function(cond){
+              df <- df
+            }
+          )
+        }
+
+        if (!is.null(input$group_by) & input$varagg != '-') {
+          tryCatch({
+            #df <- dplyr::summarise(
+            #  dplyr::group_by(df,!! rlang::parse_expr(input$group_by))
+            #  ,
+            #  !! rlang::parse_expr(input$group_by) = sum(!! rlang::parse_expr(input$varagg)
+            #            )
+            #  )
+            if (input$summerise == 'Somme') {
+              df <- dplyr::group_by_at(df,dplyr::vars(input$group_by)) %>%
+                dplyr::summarise(Somme = sum(!! rlang::parse_expr(input$varagg)))
+
+            }
+            if (input$summerise == 'Moyenne') {
+              df <- dplyr::group_by_at(df,dplyr::vars(input$group_by)) %>%
+                dplyr::summarise(Moyenne = mean(!! rlang::parse_expr(input$varagg)))
+            }
+            if (input$summerise == 'Min') {
+              df <- dplyr::group_by_at(df,dplyr::vars(input$group_by)) %>%
+                dplyr::summarise(Min = min(!! rlang::parse_expr(input$varagg)))
+            }
+            if (input$summerise == 'Max') {
+              df <- dplyr::group_by_at(df,dplyr::vars(input$group_by)) %>%
+                dplyr::summarise(Max = max(!! rlang::parse_expr(input$varagg)))
+            }
+
+          },
+          error = function(cond){
+            df <- df
+          }
+          )
+
+        }
+
+        df
+      }
+      )
+
+      #  if (input$filtre != '' & !is.null(input$select)) {
+      #
+      #
+      #   tryCatch({
+      #     df <- dplyr::mutate(
+      #       dplyr::select(
+      #         dplyr::filter(
+      #           donnee(),!! rlang::parse_expr(input$filtre)
+      #         )
+      #         ,input$select
+      #       ), n = 1)
+      #     df
+      #
+      #
+      #   },
+      #
+      #   error = function(cond){
+      #
+      #     return(dplyr::mutate(donnee(), n = 1))
+      #   }
+      #   )
+      #
+      #
+      #  }else if(input$filtre != '' & is.null(input$select)){
+      #    tryCatch({
+      #      df <-  dplyr::mutate(
+      #        dplyr::filter(
+      #          donnee(),
+      #          !! rlang::parse_expr(input$filtre)
+      #        ),n = 1)
+      #      df
+      #
+      #    },
+      #
+      #    error = function(cond){
+      #
+      #      return(dplyr::mutate(donnee(), n = 1))
+      #    }
+      #    )
+      #  }else if(input$filtre == '' & !is.null(input$select)){
+      #    tryCatch({
+      #      df <- dplyr::mutate(
+      #        dplyr::select(
+      #          donnee(),
+      #          input$select
+      #        ), n= 1)
+      #      df
+      #    },
+      #
+      #    error = function(cond){
+      #
+      #      return(dplyr::mutate(donnee(), n = 1))
+      #    }
+      #    )
+      #
+      #  }else if(input$filtre == '' & !is.null(input$select)){
+      #    tryCatch({
+      #      df <- dplyr::mutate(
+      #        dplyr::select(
+      #          donnee(),
+      #          input$select
+      #        ), n= 1)
+      #      df
+      #    },
+      #
+      #    error = function(cond){
+      #
+      #      return(dplyr::mutate(donnee(), n = 1))
+      #    }
+      #    )
+      #
+      #  }else{
+      #    return(dplyr::mutate(donnee(), n = 1))
+      #  }
+      #
+
       #Chargement dans R
       observeEvent(input$load.in.r, assign(paste0(isolate(input$nom.df)) ,NewDonnee(), envir = .GlobalEnv))
 
       #export CSV
       observeEvent(input$export.csv, write.table(x = NewDonnee(), file = paste0(global$datapath,"/",isolate(input$nom.df),".csv"),sep= ';', row.names = F))
-      # Modification des variables pour les graphs selon la table sql choisie
+      ## Modification des variables pour les graphs selon la table sql choisie####
       observe({
-        input$tables
+        isolate(input$tables)
         updateSelectInput(session, "x",
                           choices =  c('-',var()))
         updateSelectInput(session, "y",
                           choices = c('-',var()))
         updateSelectInput(session, "g",
                           choices = c('-',var()))
-        })
+      })
       observe({
         updateSelectInput(session, "table",
-                          choices = tables()$Tab)
+                          choices = isolate(tables()$Tab))
+      })
+      observe({
+        updateSelectInput(session, "select",
+                          choices =  c("-", names(donnee())))
+        updateSelectInput(session, "group_by",
+                          choices =  c("-", names(donnee())))
+        updateSelectInput(session, "varagg",
+                          choices =  c("-", names(donnee())))
+
       })
 
       ############
@@ -261,13 +425,13 @@ plotsql <- function(conn) {
           g
 
         }else if (input$type == 'null'){
-         return(ggplot2::ggplot() + ggplot2::geom_blank() + ggplot2::theme(panel.background = ggplot2::element_rect(fill = "#2c3f50"), plot.background = ggplot2::element_rect(fill = "#2c3f50", colour = 'darkgrey', size = 1)))
+          return(ggplot2::ggplot() + ggplot2::geom_blank() + ggplot2::theme(panel.background = ggplot2::element_rect(fill = "#2c3f50"), plot.background = ggplot2::element_rect(fill = "#2c3f50", colour = 'darkgrey', size = 1)))
         }
-
-          }
-        )
 
       }
       )
+
     }
-plotsql(conn)
+  )
+}
+
