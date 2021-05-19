@@ -1,4 +1,4 @@
-
+#' @export
 
 dates.periode <- function(vecdate){
   require(lubridate)
