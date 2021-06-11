@@ -8,66 +8,294 @@
 #' @examples plotdf_shinesql(conn)
 #' plotdf_shinesql()
 
-plotsql <- function(conn) {
+plotsql_ <- function(conn) {
   require(shiny)
   require(shinythemes)
   require(shinyFiles)
   require(dplyr)
   require(shinybusy)
+  require(shinydashboard)
+  require(dashboardthemes)
+  customTheme <- shinyDashboardThemeDIY(
 
-  shinyApp(
-    ui = fluidPage(theme = shinytheme("superhero"),
-                   add_busy_spinner(spin = "fading-circle"),
-                   sidebarLayout(
-                     sidebarPanel('Plot',
-                                  selectInput('table','Tables SQL', c("11001033_PAYS")),
-                                  radioButtons('type', 'Type de graphique', c('-',"colonnes", 'points', "lignes", 'histogramme' , "boxplot" , 'violons' )),
-                                  selectInput('x', "Variables en abscisse (x)", c("-")),
-                                  selectInput('y','Variable en ordonnée (y)', c("-")),
-                                  selectInput('g','Variable catégorielle', c("-"))
+    ### general
+    appFontFamily = "Arial"
+    ,appFontColor = "rgb(100,100,100)"
+    ,primaryFontColor = "rgb(0,0,0)"
+    ,infoFontColor = "rgb(0,0,0)"
+    ,successFontColor = "rgb(0,0,0)"
+    ,warningFontColor = "rgb(0,0,0)"
+    ,dangerFontColor = "rgb(0,0,0)"
+    ,bodyBackColor = "rgb(80, 80, 90)"
 
-                     ),
-                     mainPanel(plotOutput("hist"))
-                   ),
-                   sidebarLayout(
-                     sidebarPanel('Manipuler les données:',
-                                  checkboxInput('aff.table','Afficher les données', F),
-                                  textInput('filtre', 'Filtrer les données (dplyr), ex: ANNEE == 2020'),
-                                  selectInput('select',
-                                              'Selectionner les colonnes (dplyr), ex: CANTON, ANNEE',
-                                              c(""),
-                                              multiple = T),
-                                  selectInput('group_by',
-                                              'Aggrèger les données (dplyr::group_by), ex: CANTON, ANNEE',
-                                              c(""),
-                                              multiple = T),
-                                  selectInput('summerise',
-                                              "Fonction d'agrégat",
-                                              c("Somme",'Moyenne','Max','Min','Nombre de ligne')),
-                                  selectInput('varagg',
-                                              "Valeur d'aggrégat",
-                                              c(""),
-                                              multiple = F),
+    ### header
+    ,logoBackColor = "rgb(80, 80, 90)"
 
-                     ),
-                     mainPanel(
+    ,headerButtonBackColor = "rgb(238,238,238)"
+    ,headerButtonIconColor = "rgb(75,75,75)"
+    ,headerButtonBackColorHover = "rgb(210,210,210)"
+    ,headerButtonIconColorHover = "rgb(0,0,0)"
 
-                       DT::dataTableOutput('tableau')
-                     )
-                   ),
-                   sidebarLayout(
-                     sidebarPanel('Exporter',
-                                  textInput('nom.df','Nommer les données:',value = "df_sql"),
-                                  actionButton('load.in.r',"Charger dans R"),
-                                  verbatimTextOutput("dir", placeholder = TRUE),
-                                  shinyDirButton("dir", "Changer le dossier d'export", "Exporter donnée en CSV - Choix du dossier"),
-                                  actionButton('export.csv',"Exporter en csv")
-                     ),
-                     mainPanel(
-                       tableOutput('toto')
-                     )
-                   )
+    ,headerBackColor = "rgb(238,238,238)"
+    ,headerBoxShadowColor = "#aaaaaa"
+    ,headerBoxShadowSize = "2px 2px 2px"
+
+    ### sidebar
+    ,sidebarBackColor = cssGradientThreeColors(
+      direction = "down"
+      ,colorStart = "rgb(180, 180, 190)"
+      ,colorMiddle = "rgb(200, 200, 220)"
+      ,colorEnd = "rgb(220, 220, 230)"
+      ,colorStartPos = 0
+      ,colorMiddlePos = 50
+      ,colorEndPos = 100
+    )
+    ,sidebarPadding = 0
+
+    ,sidebarMenuBackColor = "transparent"
+    ,sidebarMenuPadding = 0
+    ,sidebarMenuBorderRadius = 0
+
+    ,sidebarShadowRadius = "3px 5px 5px"
+    ,sidebarShadowColor = "#aaaaaa"
+
+    ,sidebarUserTextColor = "rgb(255,255,255)"
+
+    ,sidebarSearchBackColor = "rgb(55,72,80)"
+    ,sidebarSearchIconColor = "rgb(153,153,153)"
+    ,sidebarSearchBorderColor = "rgb(55,72,80)"
+
+    ,sidebarTabTextColor = "rgb(255,255,255)"
+    ,sidebarTabTextSize = 13
+    ,sidebarTabBorderStyle = "none none solid none"
+    ,sidebarTabBorderColor = "rgb(35,106,135)"
+    ,sidebarTabBorderWidth = 1
+
+    ,sidebarTabBackColorSelected = cssGradientThreeColors(
+      direction = "right"
+      ,colorStart = "rgba(165, 165, 115,.5)"
+      ,colorMiddle = "rgba(175, 175, 131,.5)"
+      ,colorEnd = "rgba(185, 185, 146,.5)"
+      ,colorStartPos = 0
+      ,colorMiddlePos = 30
+      ,colorEndPos = 100
+    )
+    ,sidebarTabTextColorSelected = "rgb(0,0,0)"
+    ,sidebarTabRadiusSelected = "0px 20px 20px 0px"
+
+    ,sidebarTabBackColorHover = cssGradientThreeColors(
+      direction = "right"
+      ,colorStart = "rgba(180, 180, 190,1)"
+      ,colorMiddle = "rgba(180, 180, 195,1)"
+      ,colorEnd = "rgba(200, 200, 230,1)"
+      ,colorStartPos = 0
+      ,colorMiddlePos = 30
+      ,colorEndPos = 100
+    )
+    ,sidebarTabTextColorHover = "rgb(50,50,50)"
+    ,sidebarTabBorderStyleHover = "none none solid none"
+    ,sidebarTabBorderColorHover = "rgb(75,126,151)"
+    ,sidebarTabBorderWidthHover = 1
+    ,sidebarTabRadiusHover = "0px 20px 20px 0px"
+
+    ### boxes
+    ,boxBackColor = "rgb(180, 180, 190)"
+    ,boxBorderRadius = 5
+    ,boxShadowSize = "0px 1px 1px"
+    ,boxShadowColor = "rgba(0,0,0,.1)"
+    ,boxTitleSize = 16
+    ,boxDefaultColor = "rgb(100, 100, 110)"
+    ,boxPrimaryColor = "rgba(44,222,235,1)"
+    ,boxInfoColor = "rgb(210,214,220)"
+    ,boxSuccessColor = "rgba(0,255,213,1)"
+    ,boxWarningColor = "rgb(244,156,104)"
+    ,boxDangerColor = "rgb(255,88,55)"
+
+    ,tabBoxTabColor = "rgb(80, 80, 90)"
+    ,tabBoxTabTextSize = 14
+    ,tabBoxTabTextColor = "rgb(0,0,0)"
+    ,tabBoxTabTextColorSelected = "rgb(0,0,0)"
+    ,tabBoxBackColor = "rgb(255,255,255)"
+    ,tabBoxHighlightColor = "rgba(44,222,235,1)"
+    ,tabBoxBorderRadius = 5
+
+    ### inputs
+    ,buttonBackColor = "rgb(220,220,220)"
+    ,buttonTextColor = "rgb(25,25,25)"
+    ,buttonBorderColor = "rgb(240,240,240)"
+    ,buttonBorderRadius = 5
+
+    ,buttonBackColorHover = "rgb(165,165,165)"
+    ,buttonTextColorHover = "rgb(200,200,200)"
+    ,buttonBorderColorHover = "rgb(240,240,240)"
+
+
+    ,textboxBackColor = "rgb(220,220,220)"
+    ,textboxBorderColor = "rgb(200,200,200)"
+    ,textboxBorderRadius = 5
+    ,textboxBackColorSelect = "rgb(65,65,65)"
+    ,textboxBorderColorSelect = "rgb(240,240,240)"
+
+    ### tables
+    ,tableBackColor = "rgb(255,255,255)"
+    ,tableBorderColor = "rgb(240,240,240)"
+    ,tableBorderTopSize = 1
+    ,tableBorderRowSize = 1
+
+  )
+
+  header <-dashboardHeader(
+    title = 'Plot from SQL'
+  )
+
+  sidebar <-dashboardSidebar(width = 450,
+    selectInput('table','Tables SQL', c("11001033_PAYS")),
+    sidebarMenu(
+      menuSubItem('Selection graphique',
+               tabName = "plot",
+               icon = icon('chart-bar'),
+               newtab = F
+      ),
+
+      menuSubItem(
+        'Manipuler les données:',
+        tabName = 'handledata',
+        icon = icon('calculator'),
+        newtab = F
+
+
+      ),
+      menuSubItem('Exporter',
+               tabName = "export",
+               icon = icon('arrow-alt-circle-down'),
+               newtab = F
+      )
     ),
+
+    tabItems(
+      tabItem(tabName = "plot",
+              radioButtons('type', 'Type de graphique', c('-',"colonnes", 'points', "lignes", 'histogramme' , "boxplot" , 'violons' )),
+              selectInput('x', "Variables en abscisse (x)", c("-")),
+              selectInput('y','Variable en ordonnée (y)', c("-")),
+              selectInput('g','Variable catégorielle', c("-"))
+
+      ),
+      tabItem(tabName = 'handledata',
+              checkboxInput('aff.table','Afficher les données', T),
+              textInput('filtre', 'Filtrer les données (dplyr), ex: ANNEE == 2020'),
+              selectInput('select',
+                          'Selectionner les colonnes (dplyr), ex: CANTON, ANNEE',
+                          c(""),
+                          multiple = T),
+              selectInput('group_by',
+                          'Aggrèger les données (dplyr::group_by), ex: CANTON, ANNEE',
+                          c(""),
+                          multiple = T),
+              selectInput('summerise',
+                          "Fonction d'agrégat",
+                          c("Somme",'Moyenne','Max','Min','Nombre de ligne')),
+              selectInput('varagg',
+                          "Valeur d'aggrégat",
+                          c(""),
+                          multiple = F),
+      ),
+      tabItem(tabName = 'export',
+              textInput('nom.df','Nommer les données:',value = "df_sql"),
+              actionButton('load.in.r',"Charger dans R"),
+              verbatimTextOutput("dir", placeholder = TRUE),
+              shinyDirButton("dir", "Changer le dossier d'export", "Exporter donnée en CSV - Choix du dossier"),
+              actionButton('export.csv',"Exporter en csv")
+
+      )
+
+
+    )
+
+  )
+  body <- dashboardBody(
+ customTheme,
+    add_busy_spinner(spin = "semipolar",
+                     position = "top-left",
+                     height = "150px",
+                     width = "150px",
+                     margins = c(100, 700)),
+
+
+
+    fluidRow(
+
+        plotOutput("hist")
+      ),
+    fluidRow(
+
+        DT::dataTableOutput('tableau')
+
+    )
+
+  )
+  shinyApp(
+
+      ui = dashboardPage(
+        header,
+        sidebar,
+        body
+    ),
+#    ui = fluidPage(theme = shinytheme("superhero"),
+#                   add_busy_spinner(spin = "semipolar",
+#                                    position = "top-left",
+#                                    height = "150px",
+#                                    width = "150px",
+#                                    margins = c(100, 700)),
+#                   sidebarLayout(
+#                     sidebarPanel('Plot',
+#                                  selectInput('table','Tables SQL', c("11001033_PAYS")),
+#                                  radioButtons('type', 'Type de graphique', c('-',"colonnes", 'points', "lignes", 'histogramme' , "boxplot" , 'violons' )),
+#                                  selectInput('x', "Variables en abscisse (x)", c("-")),
+#                                  selectInput('y','Variable en ordonnée (y)', c("-")),
+#                                  selectInput('g','Variable catégorielle', c("-"))
+#
+#                     ),
+#                     mainPanel(plotOutput("hist"))
+#                   ),
+#                   sidebarLayout(
+#                     sidebarPanel('Manipuler les données:',
+#                                  checkboxInput('aff.table','Afficher les données', F),
+#                                  textInput('filtre', 'Filtrer les données (dplyr), ex: ANNEE == 2020'),
+#                                  selectInput('select',
+#                                              'Selectionner les colonnes (dplyr), ex: CANTON, ANNEE',
+#                                              c(""),
+#                                              multiple = T),
+#                                  selectInput('group_by',
+#                                              'Aggrèger les données (dplyr::group_by), ex: CANTON, ANNEE',
+#                                              c(""),
+#                                              multiple = T),
+#                                  selectInput('summerise',
+#                                              "Fonction d'agrégat",
+#                                              c("Somme",'Moyenne','Max','Min','Nombre de ligne')),
+#                                  selectInput('varagg',
+#                                              "Valeur d'aggrégat",
+#                                              c(""),
+#                                              multiple = F),
+#
+#                     ),
+#                     mainPanel(
+#
+#                       DT::dataTableOutput('tableau')
+#                     )
+#                   ),
+#                   sidebarLayout(
+#                     sidebarPanel('Exporter',
+#                                  textInput('nom.df','Nommer les données:',value = "df_sql"),
+#                                  actionButton('load.in.r',"Charger dans R"),
+#                                  verbatimTextOutput("dir", placeholder = TRUE),
+#                                  shinyDirButton("dir", "Changer le dossier d'export", "Exporter donnée en CSV - Choix du dossier"),
+#                                  actionButton('export.csv',"Exporter en csv")
+#                     ),
+#                     mainPanel(
+#                       tableOutput('toto')
+#                     )
+#                   )
+#    ),
     ###############################################################
     ############ SERVER   #########################################
     ###############################################################
@@ -202,82 +430,6 @@ plotsql <- function(conn) {
         df
       }
       )
-
-      #  if (input$filtre != '' & !is.null(input$select)) {
-      #
-      #
-      #   tryCatch({
-      #     df <- dplyr::mutate(
-      #       dplyr::select(
-      #         dplyr::filter(
-      #           donnee(),!! rlang::parse_expr(input$filtre)
-      #         )
-      #         ,input$select
-      #       ), n = 1)
-      #     df
-      #
-      #
-      #   },
-      #
-      #   error = function(cond){
-      #
-      #     return(dplyr::mutate(donnee(), n = 1))
-      #   }
-      #   )
-      #
-      #
-      #  }else if(input$filtre != '' & is.null(input$select)){
-      #    tryCatch({
-      #      df <-  dplyr::mutate(
-      #        dplyr::filter(
-      #          donnee(),
-      #          !! rlang::parse_expr(input$filtre)
-      #        ),n = 1)
-      #      df
-      #
-      #    },
-      #
-      #    error = function(cond){
-      #
-      #      return(dplyr::mutate(donnee(), n = 1))
-      #    }
-      #    )
-      #  }else if(input$filtre == '' & !is.null(input$select)){
-      #    tryCatch({
-      #      df <- dplyr::mutate(
-      #        dplyr::select(
-      #          donnee(),
-      #          input$select
-      #        ), n= 1)
-      #      df
-      #    },
-      #
-      #    error = function(cond){
-      #
-      #      return(dplyr::mutate(donnee(), n = 1))
-      #    }
-      #    )
-      #
-      #  }else if(input$filtre == '' & !is.null(input$select)){
-      #    tryCatch({
-      #      df <- dplyr::mutate(
-      #        dplyr::select(
-      #          donnee(),
-      #          input$select
-      #        ), n= 1)
-      #      df
-      #    },
-      #
-      #    error = function(cond){
-      #
-      #      return(dplyr::mutate(donnee(), n = 1))
-      #    }
-      #    )
-      #
-      #  }else{
-      #    return(dplyr::mutate(donnee(), n = 1))
-      #  }
-      #
 
       #Chargement dans R
       observeEvent(input$load.in.r, assign(paste0(isolate(input$nom.df)) ,NewDonnee(), envir = .GlobalEnv))
@@ -434,4 +586,4 @@ plotsql <- function(conn) {
     }
   )
 }
-
+plotsql_(conn)
