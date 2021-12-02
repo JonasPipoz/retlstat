@@ -13,6 +13,7 @@
 #' drop_replace_()
 drop_replace_ <- function(df = NULL, conn = NULL, BDD = NULL, Schema = NULL, table_name = NULL){
   require(crayon)
+  require(dplyr)
   areyousure <- 'o'
 
   if (areyousure == 'o'){
