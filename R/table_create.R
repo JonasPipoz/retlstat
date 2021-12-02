@@ -12,6 +12,7 @@
 #' @examples table_create(df = mtcars, conn = conn, BDD = 'STATPRODTEMP',Schema = 'GEN',table_name = 'MTCARS')
 #' table_create()
 table_create <- function(df = NULL, conn = NULL, BDD = NULL, Schema = NULL, table_name = NULL){
+  require(crayon)
   df <- num_to_int(df)
   table_id <- DBI::Id(schema = Schema,
                  table = table_name)

@@ -2,6 +2,7 @@
 # Sql server n'accept pas les apostrophe simple dans les string
 
 rep_guillemets <- function(df){
+  require(crayon)
   names(df)<- unlist(strsplit(  paste0("[",paste(names(df), collapse = "], ["),"]"), split=", "  ))
   df <- as.data.frame(df)
   for(col in 1:dim(df)[2]){

@@ -12,6 +12,7 @@
 #' @examples drop_replace(df = mtcars, conn = conn, BDD = 'STATPRODTEMP',Schema = 'GEN',table_name = 'MTCARS')
 #' drop_replace_()
 drop_replace_ <- function(df = NULL, conn = NULL, BDD = NULL, Schema = NULL, table_name = NULL){
+  require(crayon)
   areyousure <- 'o'
 
   if (areyousure == 'o'){
