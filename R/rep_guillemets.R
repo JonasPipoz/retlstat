@@ -18,7 +18,7 @@ rep_guillemets <- function(df){
       }
     }
   }
-  cat('Guillemets remplacés \n')
+  cat(green('\nGuillemets remplacés \n'))
   return(df)
 }
 

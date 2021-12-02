@@ -13,7 +13,6 @@
 #' table_create()
 table_create <- function(df = NULL, conn = NULL, BDD = NULL, Schema = NULL, table_name = NULL){
   df <- num_to_int(df)
-  print('Formats de nombre modifiés.')
   table_id <- DBI::Id(schema = Schema,
                  table = table_name)
   DBI::dbWriteTable(conn = conn,
@@ -22,6 +21,6 @@ table_create <- function(df = NULL, conn = NULL, BDD = NULL, Schema = NULL, tabl
                     append = T,
                     overwrite = F)
 
-cat(paste('Table', table_name, 'créée avec succès.', as.character(dim(df)[1]),'observations de ',as.character(dim(df)[2]),'variables ont été ajoutées à la table.\n'))
+cat(green(paste('Table', table_name, 'créée avec succès.', as.character(dim(df)[1]),'observations de ',as.character(dim(df)[2]),'variables ont été ajoutées à la table.\n')))
 return(NULL)
 }
