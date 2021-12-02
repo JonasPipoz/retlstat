@@ -64,8 +64,7 @@ upsert <- function(df,conn, BDD, Schema, table_name, id) {
   query = paste0("MERGE ", '[',BDD,'].[',Schema,'].[',table_name,']', " AS [Target] USING ", '[',BDD,'].[',Schema,'].[',tempname,']', " AS [Source] ON [Target].",id, " = [Source].",id," WHEN MATCHED THEN UPDATE SET ",pairsup," WHEN NOT MATCHED THEN INSERT (",pairsint,") VALUES (",pairsins,");")
   cat("\n------------------------------------------------------- \n")
   out <- tryCatch( {  res <- odbc::dbSendStatement(conn,query)
-  cat(blue(paste0("Nombre de ligne modifiés ou ajoutées :"),odbc::dbGetRowsAffected(res), '\n'))
-  odbc::dbClearResult(res); print(res) }
+  cat(paste0(blue("Nombre de ligne modifiés ou ajoutées :"),odbc::dbGetRowsAffected(res), '\n')); print(res) }
                    , error = function(e) {an.error.occured <<- TRUE
                    message("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
                    message("Erreur, la mise à jour n'a pas pu être faite. Le message suivant donne plus d'explication\n")
@@ -77,12 +76,14 @@ upsert <- function(df,conn, BDD, Schema, table_name, id) {
                      message(yellow(e))
                    }
                    message("\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
+
                    })
 
   # Drop temporary table
+  odbc::dbClearResult(res)
   query <- paste0("DROP TABLE ",'[',BDD,'].[',Schema,'].[',tempname,']')
   res2 <- odbc::dbSendStatement(conn,query)
-  cat(blue(paste0("Table temporaire supprimée. lignes contenues :"),odbc::dbGetRowsAffected(res2), '\n'))
+  cat(paste0(blue("Table temporaire supprimée. lignes contenues :"),odbc::dbGetRowsAffected(res2), '\n'))
   odbc::dbClearResult(res2)
   cat("------------------------------------------------------- \n")
 }
