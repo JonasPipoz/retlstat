@@ -24,7 +24,7 @@ upsert <- function(df,conn, BDD, Schema, table_name, id) {
   df <- rep_guillemets(df)
   df <- num_to_int(df)
   id <- paste0("[",id,"]")
-  cat(green('Correction des faux decimal en entier: Ok'))
+  cat(green('Correction des faux decimal en entier:'), 'Ok')
   col_data <- names(df)
   queries <- ''
 
@@ -64,7 +64,7 @@ upsert <- function(df,conn, BDD, Schema, table_name, id) {
   query = paste0("MERGE ", '[',BDD,'].[',Schema,'].[',table_name,']', " AS [Target] USING ", '[',BDD,'].[',Schema,'].[',tempname,']', " AS [Source] ON [Target].",id, " = [Source].",id," WHEN MATCHED THEN UPDATE SET ",pairsup," WHEN NOT MATCHED THEN INSERT (",pairsint,") VALUES (",pairsins,");")
   cat("\n------------------------------------------------------- \n")
   out <- tryCatch( {  res <- odbc::dbSendStatement(conn,query)
-  cat(blue(paste0("Nombre de ligne modifiés ou ajoutées :",odbc::dbGetRowsAffected(res), '\n')))
+  cat(blue(paste0("Nombre de ligne modifiés ou ajoutées :"),odbc::dbGetRowsAffected(res), '\n'))
   odbc::dbClearResult(res); print(res) }
                    , error = function(e) {an.error.occured <<- TRUE
                    message("\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
@@ -73,13 +73,16 @@ upsert <- function(df,conn, BDD, Schema, table_name, id) {
                                     stringr::str_detect(as.character(e),'A MERGE statement cannot UPDATE/DELETE the same row of the target table multiple times') ~ "L'identifiant ne semble pas être unique. La variable d'indentification ne doit pas contenir de doublons",
                                     TRUE ~ as.character(e))
                    message(mes)
+                   if (mes != e) {
+                     message(yellow(e))
+                   }
                    message("\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
                    })
 
   # Drop temporary table
   query <- paste0("DROP TABLE ",'[',BDD,'].[',Schema,'].[',tempname,']')
   res2 <- odbc::dbSendStatement(conn,query)
-  cat(blue(paste0("Table temporaire supprimée. lignes contenues :",odbc::dbGetRowsAffected(res2), '\n')))
+  cat(blue(paste0("Table temporaire supprimée. lignes contenues :"),odbc::dbGetRowsAffected(res2), '\n'))
   odbc::dbClearResult(res2)
   cat("------------------------------------------------------- \n")
 }
