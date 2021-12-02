@@ -15,6 +15,7 @@
 
 upsert <- function(df,conn, BDD, Schema, table_name, id) {
   require(crayon)
+  require(dplyr)
   # Create tempory table
   tempname <- paste0('temp_', random::randomStrings(1,upperalpha = T,len = 5,digits = F),'_', stringr::str_replace_all(Sys.time(),'[ :-]','') )
   table_create(conn=conn,BDD=BDD,Schema=Schema,table_name=tempname,df=df)
