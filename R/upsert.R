@@ -80,7 +80,7 @@ upsert <- function(df,conn, BDD, Schema, table_name, id) {
                    })
 
   # Drop temporary table
-  #odbc::dbClearResult(res)
+  odbc::dbClearResult(res)
   query <- paste0("DROP TABLE ",'[',BDD,'].[',Schema,'].[',tempname,']')
   res2 <- odbc::dbSendStatement(conn,query)
   cat(paste0(blue("Table temporaire supprimée. lignes contenues :"),odbc::dbGetRowsAffected(res2), '\n'))
