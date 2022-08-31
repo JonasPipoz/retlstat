@@ -14,10 +14,16 @@
 #' @examples stat_add(mtcars, conn, 'STATPRODTEMP','GEN','MTCARS')
 #' stat_add()
 
-stat_add <- function(df = NULL, conn = NULL, BDD = NULL, Schema = NULL, table_name = NULL){
-  areyousure <- readline(prompt= paste0("Etes-vous sûre de vouloir ajouter ",
-                                        nrow(df),"lignes dans la table [",BDD,"].[",Schema,"].[",
-                                        table_name,"]? o/n : "))
+stat_add <- function(df = NULL, conn = NULL, BDD = NULL, Schema = NULL, table_name = NULL, ask = TRUE){
+  if (ask == T) {
+    areyousure <- readline(prompt= paste0("Etes-vous sûre de vouloir ajouter ",
+                                          nrow(df),"lignes dans la table [",BDD,"].[",Schema,"].[",
+                                          table_name,"]? o/n : "))
+
+  }else{
+    areyousure <- 'o'
+  }
+
 
   if (areyousure == 'o'){
     df <- num_to_int(df)

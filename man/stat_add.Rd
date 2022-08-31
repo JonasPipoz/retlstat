@@ -4,7 +4,14 @@
 \alias{stat_add}
 \title{stat_add}
 \usage{
-stat_add(df = NULL, conn = NULL, BDD = NULL, Schema = NULL, table_name = NULL)
+stat_add(
+  df = NULL,
+  conn = NULL,
+  BDD = NULL,
+  Schema = NULL,
+  table_name = NULL,
+  ask = TRUE
+)
 }
 \arguments{
 \item{df}{un dataframe contenant les données}
