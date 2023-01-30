@@ -22,6 +22,7 @@ drop_table <- function(conn, bdd, schema, table_name){
     print(query)
     cat(paste0("Table: [",bdd,"].[",schema,"].[",table_name,"] supprimée.") )
     odbc::dbSendQuery(conn,query)
+    logs(methode = 'drop_table',bdd = bdd, schema = schema,table_name = table_name)
 
   }
   else{

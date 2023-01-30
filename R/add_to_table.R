@@ -42,6 +42,7 @@ stat_add <- function(df = NULL, conn = NULL, BDD = NULL, Schema = NULL, table_na
               'observations de '
               ,as.character(dim(df)[2]),
               'variables ont été ajoutées à la table.\n'))
+    logs(methode = 'add_to_table',bdd = BDD,schema = Schema,table_name = table_name)
   }
   else{
     cat('Oppération annulée')

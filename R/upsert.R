@@ -86,6 +86,7 @@ upsert <- function(df,conn, BDD, Schema, table_name, id) {
   cat(paste0(blue("Table temporaire supprimée. lignes contenues :"),odbc::dbGetRowsAffected(res2), '\n'))
   odbc::dbClearResult(res2)
   cat("------------------------------------------------------- \n")
+  logs(methode = 'upsert',bdd = BDD,schema = Schema,table_name = table_name)
 }
 
 

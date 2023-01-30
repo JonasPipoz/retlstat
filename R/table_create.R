@@ -23,5 +23,7 @@ table_create <- function(df = NULL, conn = NULL, BDD = NULL, Schema = NULL, tabl
                     overwrite = F)
 
 cat(green(paste('Table', table_name, 'créée avec succès.', as.character(dim(df)[1]),'observations de ',as.character(dim(df)[2]),'variables ont été ajoutées à la table.\n')))
+logs(methode = 'table_create',bdd = BDD,schema = Schema,table_name = table_name)
+
 return(NULL)
 }
