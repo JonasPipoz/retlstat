@@ -32,7 +32,6 @@ logs <- function(methode, bdd, schema, table_name){
                     time = time,
                     user = user,
                     project = project ,row.names = NULL)
-  print(log)
 
   query <- paste0("INSERT INTO [STATPRODTEMP].[DBO].[MAJ_TABLE_LOGS] (methode_,bdd_,schema_,table_,time_,user_,project_) VALUES ('",
                   toupper(methode),
@@ -42,7 +41,6 @@ logs <- function(methode, bdd, schema, table_name){
                   "','",time,
                   "','",user,
                   "','",project,"')")
-  print(query)
   DBI::dbSendQuery(conn = conn, statement = query)
 
 }

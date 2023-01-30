@@ -30,6 +30,7 @@ drop_replace <- function(df = NULL, conn = NULL, BDD = NULL, Schema = NULL, tabl
   cat(paste('Table', table_name, 'mise-à-jour par écrasement.',
             as.character(dim(df)[1]),'observations de ',
             as.character(dim(df)[2]),'variables ont été ajoutées à la table.\n'))
+  logs(methode = 'drop_replace',bdd = BDD, schema = Schema,table_name = table_name)
   }
   else{
     cat('Oppération annulée')
