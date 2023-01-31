@@ -16,7 +16,7 @@ resumedf <- function(df) {
   cat(paste0("----------------------------------------\n"))
   cat(paste0("----------------------------------------\n\n"))
 
-  formatdf <- sapply(df, function(x) !all(is.na(as.Date(as.character(x),format="%Y-%m-%d"))))
+  formatdf <- sapply(df, function(x) !all(is.na(as.Date(as.character(x),format="%Y-%m-%d"))) & !T %in% grepl('[A-z]',x, fixed = F))
   if (T %in% formatdf) {
 
   cat(paste0(" ---- Valeurs minimales et maximales des dates: ----- \n"))
