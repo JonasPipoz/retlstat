@@ -1,7 +1,7 @@
 Package: retlstat
 Type: Package
 Title: Update, Create, create MS SQL tables
-Version: 0.8.5
+Version: 0.8.6
 Author: Jonas Pipoz
 Maintainer: The package maintainer Jonas Pipoz <jonas.pipoz@gmail.com>
 Description: This package offer tool to insert into, update, create table in sql server.
@@ -25,5 +25,6 @@ Imports:
     shinybusy,
     dashboardthemes,
     shinydashboard,
-    crayon
-RoxygenNote: 7.1.1
+    crayon,
+    ggthemes
+RoxygenNote: 7.2.3
